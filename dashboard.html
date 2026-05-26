@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pro - Nexus Enterprise</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside class="w-64 bg-gray-800 border-r border-gray-700 hidden md:block">
+            <div class="p-6 flex items-center gap-2 border-b border-gray-700">
+                <i data-lucide="layout-dashboard" class="text-indigo-500 w-6 h-6"></i>
+                <span class="text-xl font-bold tracking-wider">NEXUS<span class="text-indigo-500">.</span></span>
+            </div>
+            <nav id="sidebar-menu" class="p-4 space-y-2">
+                <a href="javascript:void(0)" onclick="navegarA('inicio')" id="nav-inicio" class="flex items-center gap-3 px-4 py-3 bg-indigo-600 text-white rounded-lg font-medium transition">
+                    <i data-lucide="home" class="w-5 h-5"></i> Inicio
+                </a>
+                <a href="javascript:void(0)" onclick="navegarA('analiticas')" id="nav-analiticas" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-750 hover:text-white rounded-lg font-medium transition">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Analíticas
+                </a>
+                <a href="javascript:void(0)" onclick="navegarA('clientes')" id="nav-clientes" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-750 hover:text-white rounded-lg font-medium transition">
+                    <i data-lucide="users" class="w-5 h-5"></i> Clientes
+                </a>
+                <a href="javascript:void(0)" onclick="navegarA('facturacion')" id="nav-facturacion" class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-750 hover:text-white rounded-lg font-medium transition">
+                    <i data-lucide="receipt" class="w-5 h-5"></i> Facturación
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto bg-gray-900 p-6 md:p-10">
+            
+            <div id="vista-inicio" class="vista-seccion">
+                <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">Panel de Control</h1>
+                        <p class="text-sm text-gray-400 mt-1">Resumen general del ecosistema comercial.</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-gray-800 p-1 rounded-lg border border-gray-700">
+                        <button id="btn-semana" onclick="cambiarPeriodo('semana')" class="px-3 py-1.5 text-xs font-medium rounded-md text-gray-400 hover:text-white transition">7 Días</button>
+                        <button id="btn-meses" onclick="cambiarPeriodo('meses')" class="px-3 py-1.5 text-xs font-medium rounded-md bg-indigo-600 text-white shadow-sm transition">6 Meses</button>
+                    </div>
+                </header>
+
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 flex items-center justify-between shadow-sm">
+                        <div>
+                            <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Ingresos Totales</p>
+                            <h3 id="kpi-ingresos" class="text-3xl font-bold text-white mt-2">$24,500</h3>
+                        </div>
+                        <div class="p-4 bg-emerald-500/10 text-emerald-400 rounded-xl"><i data-lucide="dollar-sign" class="w-6 h-6"></i></div>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 flex items-center justify-between shadow-sm">
+                        <div>
+                            <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Nuevos Usuarios</p>
+                            <h3 id="kpi-usuarios" class="text-3xl font-bold text-white mt-2">1,240</h3>
+                        </div>
+                        <div class="p-4 bg-indigo-500/10 text-indigo-400 rounded-xl"><i data-lucide="user-plus" class="w-6 h-6"></i></div>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 flex items-center justify-between shadow-sm">
+                        <div>
+                            <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">Tasa de Conversión</p>
+                            <h3 id="kpi-conversion" class="text-3xl font-bold text-white mt-2">4.2%</h3>
+                        </div>
+                        <div class="p-4 bg-rose-500/10 text-rose-400 rounded-xl"><i data-lucide="activity" class="w-6 h-6"></i></div>
+                    </div>
+                </section>
+
+                <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="lg:col-span-2 bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-semibold text-white">Rendimiento de Ventas</h4>
+                            <span id="chart-sub" class="text-xs text-gray-400">Últimos 6 meses</span>
+                        </div>
+                        <div class="h-64"><canvas id="salesChart"></canvas></div>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-sm">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="text-lg font-semibold text-white">Fuentes de Tráfico</h4>
+                        </div>
+                        <div class="h-64 flex items-center justify-center"><canvas id="trafficChart"></canvas></div>
+                    </div>
+                </section>
+
+                <section class="bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                        <h4 class="text-lg font-semibold text-white">Últimas Actividades Financieras</h4>
+                        <button onclick="navegarA('facturacion')" class="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition">Ver facturas completo →</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-750 text-gray-400 uppercase text-xs tracking-wider">
+                                <tr>
+                                    <th class="p-4">Cliente</th>
+                                    <th class="p-4">Monto</th>
+                                    <th class="p-4">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-recientes-tbody" class="divide-y divide-gray-700">
+                                </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div id="vista-analiticas" class="vista-seccion hidden">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-bold text-white">Analíticas Avanzadas</h1>
+                    <p class="text-sm text-gray-400 mt-1">Auditoría de comportamiento métrico.</p>
+                </header>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+                        <h4 class="text-lg font-semibold text-white mb-4">Retención de Usuarios</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span class="text-gray-400">Retención Directa</span><span class="text-indigo-400 font-semibold">84%</span></div>
+                                <div class="w-full bg-gray-700 rounded-full h-2"><div class="bg-indigo-500 h-2 rounded-full" style="width: 84%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1"><span class="text-gray-400">Retención Orgánica</span><span class="text-emerald-400 font-semibold">62%</span></div>
+                                <div class="w-full bg-gray-700 rounded-full h-2"><div class="bg-emerald-500 h-2 rounded-full" style="width: 62%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-lg font-semibold text-white mb-2">Meta de Ventas Anual</h4>
+                            <p class="text-xs text-gray-400">Progreso frente al objetivo corporativo.</p>
+                        </div>
+                        <div class="mt-4"><span class="text-4xl font-extrabold text-white">$68,400</span><span class="text-sm text-gray-500"> / $100,000</span></div>
+                        <div class="w-full bg-gray-700 rounded-full h-3 mt-4"><div class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-3 rounded-full" style="width: 68.4%"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="vista-clientes" class="vista-seccion hidden">
+                <header class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white">Gestión de Clientes</h1>
+                        <p class="text-sm text-gray-400 mt-1">Directorio dinámico de cuentas.</p>
+                    </div>
+                    <button onclick="abrirModal()" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg shadow transition">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i> Nuevo Cliente
+                    </button>
+                </header>
+
+                <div class="bg-gray-800 border border-gray-700 rounded-xl p-4 mb-6 flex items-center gap-3">
+                    <i data-lucide="search" class="text-gray-400 w-5 h-5"></i>
+                    <input type="text" id="input-busqueda" onkeyup="renderizarClientes()" placeholder="Buscar cliente por nombre o email..." class="w-full bg-transparent text-white placeholder-gray-500 focus:outline-none">
+                </div>
+
+                <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-750 text-gray-400 uppercase text-xs tracking-wider">
+                                <tr>
+                                    <th class="p-4">Nombre</th>
+                                    <th class="p-4">Email</th>
+                                    <th class="p-4">Ubicación</th>
+                                    <th class="p-4">Rol</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-clientes-tbody" class="divide-y divide-gray-700">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="vista-facturacion" class="vista-seccion hidden">
+                <header class="mb-8">
+                    <h1 class="text-3xl font-bold text-white">Módulo de Facturación</h1>
+                    <p class="text-sm text-gray-400 mt-1">Historial administrativo financiero de la plataforma.</p>
+                </header>
+
+                <div class="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-750 text-gray-400 uppercase text-xs tracking-wider">
+                                <tr>
+                                    <th class="p-4">ID Factura</th>
+                                    <th class="p-4">Cliente</th>
+                                    <th class="p-4">Monto</th>
+                                    <th class="p-4">Estado</th>
+                                    <th class="p-4 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lista-facturas-tbody" class="divide-y divide-gray-700">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="modal-cliente" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 border border-gray-700 rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <h3 class="text-xl font-bold text-white mb-4">Registrar Nuevo Cliente</h3>
+            <form id="form-nuevo-cliente" onsubmit="guardarCliente(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Nombre Completo</label>
+                    <input type="text" id="form-nombre" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Correo Electrónico</label>
+                    <input type="email" id="form-email" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">País (Código)</label>
+                        <input type="text" id="form-pais" placeholder="Ej: MX, CL, CO" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-gray-400 mb-1">Plan contratado</label>
+                        <select id="form-rol" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
+                            <option value="Estándar">Estándar</option>
+                            <option value="Premium">Premium</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="cerrarModal()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-semibold transition">Guardar Acceso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN API ENDPOINT
+        const API_URL = "http://127.0.0.1:8080/api/clientes";
+        let clientes = [];
+
+        // FUNCIÓN ANTI-XSS para sanitizar las cadenas que renderiza el DOM
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.toString().replace(/[&<>"']/g, function(match) {
+                const chars = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+                return chars[match];
+            });
+        }
+
+        // CHANCE DE VISTAS (SPA ROUTER)
+        function navegarA(seccion) {
+            document.querySelectorAll('.vista-seccion').forEach(div => div.classList.add('hidden'));
+            document.getElementById(`vista-${seccion}`).classList.remove('hidden');
+
+            const botonesNav = ['inicio', 'analiticas', 'clientes', 'facturacion'];
+            botonesNav.forEach(b => {
+                const el = document.getElementById(`nav-${b}`);
+                if (el) {
+                    el.className = b === seccion 
+                        ? "flex items-center gap-3 px-4 py-3 bg-indigo-600 text-white rounded-lg font-medium transition"
+                        : "flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-750 hover:text-white rounded-lg font-medium transition";
+                }
+            });
+        }
+
+        // CARGA ASÍNCRONA DESDE EL BACKEND (FastAPI + SQLite)
+        async function obtenerClientesDeAPI() {
+            try {
+                const respuesta = await fetch(API_URL);
+                if (respuesta.ok) {
+                    const datos = await respuesta.json();
+                    // Mapeo ordenado convirtiendo las respuestas snake_case del backend
+                    clientes = datos.map(c => ({
+                        id: c.id_avatar,
+                        idFactura: `NXS-2026-00${c.id_db}`,
+                        nombre: c.nombre,
+                        email: c.email,
+                        pais: c.pais,
+                        rol: c.rol,
+                        factura: c.factura,
+                        estadoFactura: c.estado_factura
+                    }));
+                } else {
+                    console.error("Error al leer el directorio desde la API.");
+                }
+            } catch (error) {
+                console.error("No se pudo establecer conexión con el servidor FastAPI:", error);
+            }
+        }
+
+        async function renderizerTodo() {
+            await obtenerClientesDeAPI(); // Petición asíncrona centralizada
+            renderizarClientes();
+            renderizarFacturas();
+            renderizarRecientesFinanzas();
+        }
+
+        function renderizarClientes() {
+            const query = document.getElementById('input-busqueda').value.toLowerCase();
+            const tbody = document.getElementById('lista-clientes-tbody');
+            tbody.innerHTML = "";
+
+            clientes.forEach(c => {
+                if (c.nombre.toLowerCase().includes(query) || c.email.toLowerCase().includes(query)) {
+                    let badgeColor = c.rol === 'Admin' ? 'bg-indigo-500/10 text-indigo-400' : c.rol === 'Premium' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-gray-700 text-gray-300';
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-750/50 transition">
+                            <td class="p-4 font-medium text-white flex items-center gap-3">
+                                <div class="w-8 h-8 bg-indigo-600/20 text-indigo-400 rounded-full flex items-center justify-center font-bold text-xs">${escapeHTML(c.id)}</div>
+                                <span>${escapeHTML(c.nombre)}</span>
+                            </td>
+                            <td class="p-4 text-gray-300">${escapeHTML(c.email)}</td>
+                            <td class="p-4 text-gray-400">${escapeHTML(c.pais)}</td>
+                            <td class="p-4"><span class="px-2 py-0.5 text-xs font-medium rounded-full ${badgeColor}">${escapeHTML(c.rol)}</span></td>
+                        </tr>
+                    `;
+                }
+            });
+        }
+
+        function renderizarFacturas() {
+            const tbody = document.getElementById('lista-facturas-tbody');
+            tbody.innerHTML = "";
+
+            clientes.forEach(c => {
+                let statusColor = c.estadoFactura === 'Completado' ? 'bg-emerald-500/10 text-emerald-400' : c.estadoFactura === 'Pendiente' ? 'bg-amber-500/10 text-amber-400' : 'bg-rose-500/10 text-rose-400';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-750/50 transition">
+                        <td class="p-4 font-mono text-gray-400 text-xs">${escapeHTML(c.idFactura)}</td>
+                        <td class="p-4 font-medium text-white">${escapeHTML(c.nombre)}</td>
+                        <td class="p-4 font-semibold text-white">$${c.factura.toFixed(2)}</td>
+                        <td class="p-4"><span class="px-2 py-1 text-xs font-semibold rounded-full ${statusColor}">${escapeHTML(c.estadoFactura)}</span></td>
+                        <td class="p-4 text-right">
+                            <button onclick="emitirAlertaFactura('${escapeHTML(c.nombre)}')" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 ml-2 hover:underline">Descargar PDF</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderizarRecientesFinanzas() {
+            const tbody = document.getElementById('lista-recientes-tbody');
+            tbody.innerHTML = "";
+            
+            // Muestra los últimos 3 de la base de datos de forma invertida
+            const recientes = clientes.slice(-3).reverse();
+            recientes.forEach(c => {
+                let statusColor = c.estadoFactura === 'Completado' ? 'bg-emerald-500/10 text-emerald-400' : c.estadoFactura === 'Pendiente' ? 'bg-amber-500/10 text-amber-400' : 'bg-rose-500/10 text-rose-400';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-750/50 transition">
+                        <td class="p-4 font-medium text-white">${escapeHTML(c.nombre)}</td>
+                        <td class="p-4 font-mono text-gray-300">$${c.factura.toFixed(2)}</td>
+                        <td class="p-4"><span class="px-2 py-0.5 text-xs font-semibold rounded-full ${statusColor}">${escapeHTML(c.estadoFactura)}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function emitirAlertaFactura(cliente) {
+            alert(`Generando documento contable estructurado para: ${cliente}.`);
+        }
+
+        function abrirModal() { document.getElementById('modal-cliente').classList.remove('hidden'); }
+        function cerrarModal() { document.getElementById('modal-cliente').classList.add('hidden'); }
+
+        // ENVÍO DE DATOS AL BACKEND MEDIANTE POST (JSON)
+        async function guardarCliente(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('form-nombre').value.trim();
+            const email = document.getElementById('form-email').value.trim();
+            const pais = document.getElementById('form-pais').value.trim();
+            const rol = document.getElementById('form-rol').value;
+
+            if(!nombre || !email || !pais) return;
+
+            const payload = { nombre, email, pais, rol };
+
+            try {
+                const respuesta = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (respuesta.ok) {
+                    document.getElementById('form-nuevo-cliente').reset();
+                    cerrarModal();
+                    // Refrescar el estado completo de la app trayendo los datos limpios de SQLite
+                    await renderizerTodo();
+                } else {
+                    const errData = await respuesta.json();
+                    alert(`Error del Servidor: ${errData.detail || "No se pudo registrar el cliente."}`);
+                }
+            } catch (error) {
+                alert("Error crítico de red. Verifica que el servidor FastAPI esté corriendo.");
+            }
+        }
+
+        // INITIALIZE CHART.JS ENGINE
+        const ctxSales = document.getElementById('salesChart').getContext('2d');
+        window.salesChart = new Chart(ctxSales, {
+            type: 'line',
+            data: {
+                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Ventas ($)',
+                    data: [12000, 15000, 14000, 18500, 22000, 24500],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        const ctxTraffic = document.getElementById('trafficChart').getContext('2d');
+        window.trafficChart = new Chart(ctxTraffic, {
+            type: 'doughnut',
+            data: {
+                labels: ['Directo', 'Orgánico', 'Redes'],
+                datasets: [{ data: [45, 35, 20], backgroundColor: ['#6366f1', '#10b981', '#f43f5e'], borderWidth: 0 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        const datosPorPeriodo = {
+            semana: { ventas: [1500, 2300, 1800, 3100, 2900, 4200], meses: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'], kpis: { ingresos: "$4,200", usuarios: "180", conversion: "4.5%" }, subtitulo: "Últimos 7 días" },
+            meses: { ventas: [12000, 15000, 14000, 18500, 22000, 24500], meses: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'], kpis: { ingresos: "$24,500", usuarios: "1,240", conversion: "4.2%" }, subtitulo: "Últimos 6 meses" }
+        };
+
+        function cambiarPeriodo(periodo) {
+            const nuevosDatos = datosPorPeriodo[periodo];
+            salesChart.data.labels = nuevosDatos.meses;
+            salesChart.data.datasets[0].data = nuevosDatos.ventas;
+            salesChart.update();
+            document.getElementById('kpi-ingresos').innerText = nuevosDatos.kpis.ingresos;
+            document.getElementById('kpi-usuarios').innerText = nuevosDatos.kpis.usuarios;
+            document.getElementById('kpi-conversion').innerText = nuevosDatos.kpis.conversion;
+            document.getElementById('chart-sub').innerText = nuevosDatos.subtitulo;
+
+            const btnSemana = document.getElementById('btn-semana');
+            const btnMeses = document.getElementById('btn-meses');
+            if (periodo === 'semana') {
+                btnSemana.className = "px-3 py-1.5 text-xs font-medium rounded-md bg-indigo-600 text-white shadow-sm transition";
+                btnMeses.className = "px-3 py-1.5 text-xs font-medium rounded-md text-gray-400 hover:text-white transition";
+            } else {
+                btnMeses.className = "px-3 py-1.5 text-xs font-medium rounded-md bg-indigo-600 text-white shadow-sm transition";
+                btnSemana.className = "px-3 py-1.5 text-xs font-medium rounded-md text-gray-400 hover:text-white transition";
+            }
+        }
+
+        // CARGA INICIAL INTEGRADA
+        renderizerTodo();
+        lucide.createIcons();
+    </script>
+</body>
+</html>
